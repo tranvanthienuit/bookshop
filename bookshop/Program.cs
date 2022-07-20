@@ -1,13 +1,12 @@
 using System.Text;
+using bookshop.DbContext;
 using bookshop.Entity;
+using bookshop.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using uitbook.Data;
-using uitbook.Entity;
-using uitbook.Service;
 using uitbooks.Token;
 
 var builder = WebApplication.CreateBuilder(args);

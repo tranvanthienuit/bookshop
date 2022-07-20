@@ -1,7 +1,10 @@
-﻿namespace bookshop.Entity;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace bookshop.Entity;
 
 public class Book
 {
+    [Key]
     public String bookId{ get; set; }
     public String nameBook{ get; set; }
     public String author{ get; set; }

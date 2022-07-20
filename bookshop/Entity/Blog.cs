@@ -1,7 +1,10 @@
-﻿namespace bookshop.Entity;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace bookshop.Entity;
 
 public class Blog
 {
+    [Key]
     public String blogId{ get; set; }
     public String context{ get; set; }
     public String content{ get; set; }

@@ -1,7 +1,10 @@
-﻿namespace bookshop.Entity;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace bookshop.Entity;
 
 public class Order
 {
+    [Key]
     public String orderId { get; set; }
     public DateTime dayAdd { get; set; } = DateTime.Now;
     public int totalBook { get; set; }
