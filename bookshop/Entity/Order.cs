@@ -15,4 +15,6 @@ public class Order
     public String pay { get; set; }
     public String username { get; set; }
     public String fullname { get; set; }
+    public List<OrderDe> OrderDes { get; set; }
+    public User User { get; set; }
 }

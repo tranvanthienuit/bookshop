@@ -8,4 +8,6 @@ public class OrderDe
     public String orderId { get; set; }
     public int count { get; set; }
     public Double totalPrice { get; set; }
+    public Book Book { get; set; }
+    public Order Order { get; set; }
 }

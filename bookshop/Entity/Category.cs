@@ -7,5 +7,5 @@ public class Category
     [Key]
     public String categoryId { get; set; }
     public String categoryName { get; set; }
-    
+    public List<Book> Books { get; set; }
 }

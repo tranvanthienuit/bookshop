@@ -18,7 +18,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 String connection =
-    "server=localhost; port=3306; database=uitbooks; user=root; password=root";
+    "server=localhost; port=3306; database=bookshop; user=root; password=root";
 builder.Services.AddDbContext<Dbcontext>(option => option.UseMySql(connection, ServerVersion.AutoDetect(connection)));
 builder.Services.AddSwaggerGen(c =>
 {

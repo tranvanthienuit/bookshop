@@ -10,4 +10,5 @@ public class Blog
     public String content{ get; set; }
     public DateTime dayAdd { get; set; } = DateTime.Now;
     public Byte[] image{ get; set; }
+    public User User { get; set; }
 }
