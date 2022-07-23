@@ -1,39 +1,79 @@
-﻿using bookshop.Entity;
+﻿using bookshop.DbContext;
+using bookshop.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace bookshop.Service;
 
 public interface OrderDeInter
 {
-    public Task<bool> saveOrderDe(OrderDe order);
-    public Task<bool> deleteOrderDe(String orderId);
-    public Task<bool> editOrderDe(OrderDe order);
-    public Task<Order> findOrderDeById(String orderId);
-    public Task<List<OrderDe>> findOrderDe(String order);
+    public Task<bool> saveOrderDe(OrderDe orderRequest);
+    public Task<bool> deleteOrderDe(String orderRequestId);
+    public Task<OrderDe> findOrderDeById(String orderRequestId);
+    public Task<List<OrderDe>> findOrderDe(String orderRequest);
 }
 public class OrderDeService: OrderDeInter
 {
-    public Task<bool> saveOrderDe(OrderDe order)
+    private readonly Dbcontext _dbcontext;
+
+    public OrderDeService(Dbcontext dbcontext)
     {
-        throw new NotImplementedException();
+        _dbcontext = dbcontext;
     }
 
-    public Task<bool> deleteOrderDe(string orderId)
+    public async Task<bool> saveOrderDe(OrderDe orderRequest)
     {
-        throw new NotImplementedException();
+        try
+        {
+            await _dbcontext.OrderDes.AddAsync(orderRequest);
+            await _dbcontext.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
     }
 
-    public Task<bool> editOrderDe(OrderDe order)
+    public async Task<bool> deleteOrderDe(string orderRequestId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            OrderDe orderDe = await _dbcontext.OrderDes.FindAsync(orderRequestId) ?? throw new InvalidOperationException();
+            _dbcontext.OrderDes.Remove(orderDe);
+            await _dbcontext.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
     }
 
-    public Task<Order> findOrderDeById(string orderId)
+    public async Task<OrderDe> findOrderDeById(string orderRequestId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            return await _dbcontext.OrderDes.FindAsync(orderRequestId) ?? throw new InvalidOperationException();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return null;
+        }
     }
 
-    public Task<List<OrderDe>> findOrderDe(string order)
+    public async Task<List<OrderDe>> findOrderDe(string orderRequest)
     {
-        throw new NotImplementedException();
+        try
+        {
+            return await _dbcontext.OrderDes.ToListAsync();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return null;
+        }
     }
 }

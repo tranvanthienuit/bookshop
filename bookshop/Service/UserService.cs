@@ -107,20 +107,20 @@ public class UserService : UserInter
     {
         try
         {
-            User user = new User()
+            var user = await _userManager.FindByNameAsync(userRequest.username);
+            if (user!=null)
             {
-                UserName = userRequest.username,
-                fullname = userRequest.fullname,
-                address = userRequest.address,
-                sex = userRequest.sex,
-                image = Encoding.ASCII.GetBytes(userRequest.image)
-            };
+                user.UserName = userRequest.username;
+                user.fullname = userRequest.fullname;
+                user.address = userRequest.address;
+                user.sex = userRequest.sex;
+                user.image = Encoding.ASCII.GetBytes(userRequest.image);
+            }
             var result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)
             {
                 return true;
             }
-
             return false;
         }
         catch (Exception e)

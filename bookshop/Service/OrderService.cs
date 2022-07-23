@@ -1,39 +1,102 @@
-﻿using bookshop.Entity;
+﻿using bookshop.DbContext;
+using bookshop.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace bookshop.Service;
 
 public interface OrderInter
 {
-    public Task<bool> saveOrder(Order order);
+    public Task<bool> saveOrder(Order orderRequest);
     public Task<bool> deleteOrder(String orderId);
-    public Task<bool> editOrder(Order order);
+    public Task<bool> editOrder(Order orderRequest);
     public Task<Order> findOrderById(String orderId);
-    public Task<List<Order>> findOrder(String order);
+    public Task<List<Order>> findOrder(String orderRequest);
 }
 public class OrderService : OrderInter
 {
-    public Task<bool> saveOrder(Order order)
+    private readonly Dbcontext _dbcontext;
+
+    public OrderService(Dbcontext dbcontext)
     {
-        throw new NotImplementedException();
+        _dbcontext = dbcontext;
     }
 
-    public Task<bool> deleteOrder(string orderId)
+    public async Task<bool> saveOrder(Order order)
     {
-        throw new NotImplementedException();
+        try
+        {
+            await _dbcontext.Orders.AddAsync(order);
+            await _dbcontext.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
     }
 
-    public Task<bool> editOrder(Order order)
+    public async Task<bool> deleteOrder(string orderId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            Order order = await _dbcontext.Orders.FindAsync(orderId) ?? throw new InvalidOperationException();
+            _dbcontext.Orders.Remove(order);
+            await _dbcontext.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
     }
 
-    public Task<Order> findOrderById(string orderId)
+    public async Task<bool> editOrder(Order orderRequest)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var order = await _dbcontext.Orders.FindAsync(orderRequest.orderId);
+            if (order!=null)
+            {
+                order.telephone = orderRequest.telephone;
+                order.address = orderRequest.address;
+                order.fullname = orderRequest.fullname;
+            }
+            _dbcontext.Orders.Update(order ?? throw new InvalidOperationException());
+            await _dbcontext.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
     }
 
-    public Task<List<Order>> findOrder(string order)
+    public async Task<Order> findOrderById(string orderId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            return await _dbcontext.Orders.FindAsync(orderId) ?? throw new InvalidOperationException();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return  null;
+        }
+    }
+
+    public async Task<List<Order>> findOrder(string order)
+    {
+        try
+        {
+            return await _dbcontext.Orders.ToListAsync();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return null;
+        }
     }
 }

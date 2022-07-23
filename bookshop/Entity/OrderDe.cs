@@ -5,7 +5,7 @@ namespace bookshop.Entity;
 public class OrderDe
 {
     [Key]
-    public String orderId { get; set; }
+    public String orderDeId { get; set; }
     public int count { get; set; }
     public Double totalPrice { get; set; }
     public Book Book { get; set; }

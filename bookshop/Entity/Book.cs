@@ -15,6 +15,6 @@ public class Book
     public Byte[] image { get; set; }
     public Category Category { get; set; }
     public List<OrderDe> OrderDes{ get; set; }
-    public List<Comment> Comments{ get; set; }
-    public List<Rate> Rates{ get; set; }
+    // public List<Comment> Comments{ get; set; }
+    // public List<Rate> Rates{ get; set; }
 }
