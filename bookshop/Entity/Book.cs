@@ -12,6 +12,7 @@ public class Book
     public DateTime dayAdd { get; set; }=DateTime.Now;
     public Double price{ get; set; }
     public int count{ get; set; }
+    public Byte[] image { get; set; }
     public Category Category { get; set; }
     public List<OrderDe> OrderDes{ get; set; }
     public List<Comment> Comments{ get; set; }

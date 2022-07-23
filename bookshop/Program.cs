@@ -79,7 +79,13 @@ builder.Services.Configure<IdentityOptions>(options =>
 
 builder.Services.AddScoped<IJwtUtils, JwtUtils>();
 builder.Services.AddScoped<UserInter, UserService>();
-// builder.Services.AddScoped<RoleInter, RoleService>();
+builder.Services.AddScoped<RateInter, RateService>();
+builder.Services.AddScoped<OrderInter, OrderService>();
+builder.Services.AddScoped<OrderDeInter, OrderDeService>();
+builder.Services.AddScoped<CmtInter, CmtService>();
+builder.Services.AddScoped<CateInter, CateService>();
+builder.Services.AddScoped<BookInter, BookService>();
+builder.Services.AddScoped<BlogInter, BlogService>();
 builder.Services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<Dbcontext>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -99,6 +105,8 @@ builder.Services.AddAuthorization(options =>
         policy => policy.RequireRole("user"));
     options.AddPolicy("admin",
         policy => policy.RequireRole("admin"));
+    options.AddPolicy("seller",
+        policy => policy.RequireRole("seller"));
 });
 builder.Services.AddMvc();
 builder.Services.AddRazorPages();
