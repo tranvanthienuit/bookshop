@@ -240,12 +240,12 @@ public class AdminController : Controller
         }
     }
     //User
-    [HttpGet("/admin/find-user")]
-    public async Task<IActionResult> findUser()
+    [HttpGet("/admin/find-user/{text}/{pageIndex}")]
+    public async Task<IActionResult> findUser(String text,int pageIndex=1)
     {
         try
         {
-            var result = await _userInter.findUser("aaa",0);
+            var result = await _userInter.findUser(text,pageIndex);
             if (result!=null)
             {
                 return Ok(result);

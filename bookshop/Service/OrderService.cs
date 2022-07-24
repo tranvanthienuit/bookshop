@@ -89,16 +89,34 @@ public class OrderService : OrderInter
         }
     }
 
-    public async Task<Response<Order>> findOrder(string order,int pageIndex)
+    public async Task<Response<Order>> findOrder(string? order,int pageIndex)
     {
         try
         {
-            Response<Order> orderList = new Response<Order>()
+            if (order==null)
             {
-                result = PaginatedList<Order>.CreateAsync(_dbcontext.Orders.ToList(), pageIndex, 5),
-                totalBook = _dbcontext.Books.ToList().Count
-            };
-            return orderList;
+                Response<Order> orderList = new Response<Order>()
+                {
+                    result = PaginatedList<Order>.CreateAsync(_dbcontext.Orders.ToList(), pageIndex, 5),
+                    totalBook = _dbcontext.Books.ToList().Count
+                };
+                return orderList;
+            }
+            var orderFilter = await _dbcontext.Orders.Where(x=>
+                x.fullname.Contains(order) || x.address.Contains(order) ||
+                x.telephone.Contains(order) || x.username.Contains(order) ||
+                x.orderId.Contains(order) || x.status.Contains(order)).ToListAsync();
+            if (orderFilter!=null)
+            {
+                Response<Order> orderList = new Response<Order>()
+                {
+                    result = PaginatedList<Order>.CreateAsync(orderFilter, pageIndex, 5),
+                    totalBook = _dbcontext.Books.ToList().Count
+                };
+                return orderList;
+            }
+
+            return null;
         }
         catch (Exception e)
         {

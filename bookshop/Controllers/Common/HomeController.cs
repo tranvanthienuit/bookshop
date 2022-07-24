@@ -87,4 +87,18 @@ public class HomeController : Controller
             throw;
         }
     }
+
+    [HttpGet("/home/{text}/{pageIndex}")]
+    public async Task<IActionResult> search(String text,int pageIndex=1)
+    {
+        try
+        {
+            return Ok(await _bookInter.findBook(text, pageIndex));
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
 }

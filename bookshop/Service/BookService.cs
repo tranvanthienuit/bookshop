@@ -13,7 +13,7 @@ public interface BookInter
     public Task<bool> deleteBook(String bookId);
     public Task<bool> editBook(BookRequest bookRequest);
     public Task<Book> findBookById(String bookId);
-    public Task<Response<Book>> findBook(String Book,int pageIndex);
+    public Task<Response<Book>> findBook(string? Book, int pageIndex);
 }
 
 public class BookService : BookInter
@@ -103,15 +103,28 @@ public class BookService : BookInter
         }
     }
 
-    public async Task<Response<Book>> findBook(string Book,int pageIndex)
+    public async Task<Response<Book>> findBook(string? bookRequest, int pageIndex)
     {
         try
         {
-            if (Book==null)
+            if (bookRequest == null)
             {
                 Response<Book> book = new Response<Book>()
                 {
                     result = PaginatedList<Book>.CreateAsync(_dbcontext.Books.ToList(), pageIndex, 5),
+                    totalBook = _dbcontext.Books.ToList().Count
+                };
+                return book;
+            }
+
+            var bookFilter = await _dbcontext.Books.Where(x =>
+                x.nameBook.Contains(bookRequest) || x.author.Contains(bookRequest) ||
+                x.Category.categoryName.Contains(bookRequest)).ToListAsync();
+            if (bookFilter != null)
+            {
+                Response<Book> book = new Response<Book>()
+                {
+                    result = PaginatedList<Book>.CreateAsync(bookFilter, pageIndex, 5),
                     totalBook = _dbcontext.Books.ToList().Count
                 };
                 return book;

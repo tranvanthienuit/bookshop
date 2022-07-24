@@ -12,7 +12,7 @@ public interface CateInter
     public Task<bool> deleteCate(String cateId);
     public Task<bool> editCate(Category Cate);
     public Task<Category> findCateById(String cateId);
-    public Task<Response<Category>> findCate(String Cate,int pageIndex);
+    public Task<Response<Category>> findCate(String Cate, int pageIndex);
 }
 
 public class CateService : CateInter
@@ -89,16 +89,32 @@ public class CateService : CateInter
         }
     }
 
-    public async Task<Response<Category>> findCate(string Cate,int pageIndex)
+    public async Task<Response<Category>> findCate(string? cate, int pageIndex)
     {
         try
         {
-            Response<Category> category = new Response<Category>()
+            if (cate == null)
             {
-                result = PaginatedList<Category>.CreateAsync(_dbcontext.Categories.ToList(), pageIndex, 5),
-                totalBook = _dbcontext.Books.ToList().Count
-            };
-            return category;
+                Response<Category> category = new Response<Category>()
+                {
+                    result = PaginatedList<Category>.CreateAsync(_dbcontext.Categories.ToList(), pageIndex, 5),
+                    totalBook = _dbcontext.Books.ToList().Count
+                };
+                return category;
+            }
+
+            var cateFilter = await _dbcontext.Categories.Where(x => x.categoryName.Contains(cate)).ToListAsync();
+            if (cateFilter != null)
+            {
+                Response<Category> category = new Response<Category>()
+                {
+                    result = PaginatedList<Category>.CreateAsync(cateFilter, pageIndex, 5),
+                    totalBook = _dbcontext.Books.ToList().Count
+                };
+                return category;
+            }
+
+            return null;
         }
         catch (Exception e)
         {

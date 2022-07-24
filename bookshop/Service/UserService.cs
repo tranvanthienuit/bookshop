@@ -4,6 +4,7 @@ using bookshop.Entity;
 using bookshop.Entity.Model;
 using bookshop.Paging;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace bookshop.Service;
 
@@ -12,9 +13,10 @@ public interface UserInter
     public Task<bool> saveUser(UserRequest userRequest);
     public Task<bool> deleteUser(String userId);
     public Task<bool> editUser(UserRequest userRequest);
-    public Task<Response<User>> findUser(String user,int pageIndex);
+    public Task<Response<User>> findUser(String user, int pageIndex);
     public Task<User> findUserById(String userId);
 }
+
 public class UserService : UserInter
 {
     private readonly UserManager<User> _userManager;
@@ -39,6 +41,7 @@ public class UserService : UserInter
                 identityRole.Name = "admin";
                 await _roleManager.CreateAsync(identityRole);
             }
+
             var userRole = await _roleManager.RoleExistsAsync("user");
             if (!userRole)
             {
@@ -46,6 +49,7 @@ public class UserService : UserInter
                 identityRole.Name = "seller";
                 await _roleManager.CreateAsync(identityRole);
             }
+
             var sellerRole = await _roleManager.RoleExistsAsync("seller");
             if (!sellerRole)
             {
@@ -55,10 +59,11 @@ public class UserService : UserInter
             }
 
             var userExist = await _userManager.FindByNameAsync(userRequest.username);
-            if (userExist!=null)
+            if (userExist != null)
             {
                 return false;
             }
+
             User user = new User()
             {
                 UserName = userRequest.username,
@@ -67,11 +72,12 @@ public class UserService : UserInter
                 sex = userRequest.sex,
                 image = Encoding.ASCII.GetBytes(userRequest.image)
             };
-            var result = await _userManager.CreateAsync(user,userRequest.password);
+            var result = await _userManager.CreateAsync(user, userRequest.password);
             if (result.Succeeded)
             {
                 return true;
             }
+
             return false;
         }
         catch (Exception e)
@@ -108,7 +114,7 @@ public class UserService : UserInter
         try
         {
             var user = await _userManager.FindByNameAsync(userRequest.username);
-            if (user!=null)
+            if (user != null)
             {
                 user.UserName = userRequest.username;
                 user.fullname = userRequest.fullname;
@@ -116,11 +122,13 @@ public class UserService : UserInter
                 user.sex = userRequest.sex;
                 user.image = Encoding.ASCII.GetBytes(userRequest.image);
             }
+
             var result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)
             {
                 return true;
             }
+
             return false;
         }
         catch (Exception e)
@@ -130,16 +138,34 @@ public class UserService : UserInter
         }
     }
 
-    public async Task<Response<User>> findUser(string user,int pageIndex=1)
+    public async Task<Response<User>> findUser(string? user, int pageIndex = 1)
     {
         try
         {
-            Response<User> User = new Response<User>()
+            if (user == null)
             {
-                result = PaginatedList<User>.CreateAsync(_dbContext.Users.ToList(), pageIndex, 5),
-                totalBook = _dbContext.Books.ToList().Count
-            };
-            return User;
+                Response<User> User = new Response<User>()
+                {
+                    result = PaginatedList<User>.CreateAsync(_dbContext.Users.ToList(), pageIndex, 5),
+                    totalBook = _dbContext.Books.ToList().Count
+                };
+                return User;
+            }
+
+            var userFilter = await _dbContext.Users.Where(x =>
+                x.UserName.Contains(user) || x.fullname.Contains(user) || x.Email.Contains(user) ||
+                x.address.Contains(user)).ToListAsync();
+            if (userFilter != null)
+            {
+                Response<User> User = new Response<User>()
+                {
+                    result = PaginatedList<User>.CreateAsync(userFilter, pageIndex, 5),
+                    totalBook = _dbContext.Books.ToList().Count
+                };
+                return User;
+            }
+
+            return null;
         }
         catch (Exception e)
         {
