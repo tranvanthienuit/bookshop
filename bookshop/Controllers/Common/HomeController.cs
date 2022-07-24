@@ -1,5 +1,4 @@
-﻿using bookshop.Entity;
-using bookshop.Entity.Model;
+﻿using bookshop.Entity.Model;
 using bookshop.Service;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,15 +9,15 @@ namespace bookshop.Controllers.Common;
 [ApiController]
 public class HomeController : Controller
 {
-    private readonly UserManager<User> _userManager;
+    private readonly UserManager<Entity.User> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
-    private readonly SignInManager<User> _signInManager;
+    private readonly SignInManager<Entity.User> _signInManager;
     private readonly UserInter _userInter;
     private readonly IJwtUtils _jwtUtils;
     private readonly BookInter _bookInter;
 
-    public HomeController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager,
-        SignInManager<User> signInManager, UserInter userInter, IJwtUtils jwtUtils, BookInter bookInter)
+    public HomeController(UserManager<Entity.User> userManager, RoleManager<IdentityRole> roleManager,
+        SignInManager<Entity.User> signInManager, UserInter userInter, IJwtUtils jwtUtils, BookInter bookInter)
     {
         _userManager = userManager;
         _roleManager = roleManager;
@@ -36,7 +35,7 @@ public class HomeController : Controller
             var result = await _userInter.saveUser(userRequest);
             if (result)
             {
-                User user = await _userManager.FindByNameAsync(userRequest.username);
+                Entity.User user = await _userManager.FindByNameAsync(userRequest.username);
                 await _userManager.AddToRoleAsync(user, "user");
                 return Ok("thanh cong");
             }
@@ -55,7 +54,7 @@ public class HomeController : Controller
     {
         try
         {
-            User user = await _userManager.FindByNameAsync(userLogin.username);
+            Entity.User user = await _userManager.FindByNameAsync(userLogin.username);
             if (user != null)
             {
                 var result = await _signInManager.PasswordSignInAsync(userLogin.username, userLogin.password, false, true);
@@ -80,7 +79,7 @@ public class HomeController : Controller
     {
         try
         {
-            return Ok(_bookInter.findBook(null, pageIndex));
+            return Ok(await _bookInter.findBook(null, pageIndex));
         }
         catch (Exception e)
         {

@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace bookshop.Entity;
 
 public class Book
 {
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public String bookId{ get; set; }
     public String nameBook{ get; set; }
     public String author{ get; set; }

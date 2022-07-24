@@ -103,8 +103,6 @@ builder.Services.AddAuthorization(options =>
         policy => policy.RequireRole("user"));
     options.AddPolicy("admin",
         policy => policy.RequireRole("admin"));
-    options.AddPolicy("seller",
-        policy => policy.RequireRole("seller"));
 });
 builder.Services.AddMvc();
 builder.Services.AddRazorPages();

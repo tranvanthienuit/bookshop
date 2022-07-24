@@ -4,16 +4,15 @@ using bookshop.Entity;
 using bookshop.Entity.Model;
 using bookshop.Paging;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace bookshop.Service;
 
 public interface UserInter
 {
     public Task<bool> saveUser(UserRequest userRequest);
-    public Task<bool> deleteUserById(String userId);
+    public Task<bool> deleteUser(String userId);
     public Task<bool> editUser(UserRequest userRequest);
-    public Task<List<User>> findUser(String user,int pageIndex);
+    public Task<Response<User>> findUser(String user,int pageIndex);
     public Task<User> findUserById(String userId);
 }
 public class UserService : UserInter
@@ -82,7 +81,7 @@ public class UserService : UserInter
         }
     }
 
-    public async Task<bool> deleteUserById(string userId)
+    public async Task<bool> deleteUser(string userId)
     {
         try
         {
@@ -131,13 +130,16 @@ public class UserService : UserInter
         }
     }
 
-    public async Task<List<User>> findUser(string user,int pageIndex)
+    public async Task<Response<User>> findUser(string user,int pageIndex=1)
     {
         try
         {
-            int pageNumber = pageIndex;
-            var userList = _userManager.Users.ToList();
-            return PaginatedList<User>.CreateAsync(userList, pageNumber, 5);
+            Response<User> User = new Response<User>()
+            {
+                result = PaginatedList<User>.CreateAsync(_dbContext.Users.ToList(), pageIndex, 5),
+                totalBook = _dbContext.Books.ToList().Count
+            };
+            return User;
         }
         catch (Exception e)
         {
@@ -148,6 +150,14 @@ public class UserService : UserInter
 
     public async Task<User> findUserById(string userId)
     {
-        return await _userManager.FindByIdAsync(userId);
+        try
+        {
+            return await _userManager.FindByIdAsync(userId);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return null;
+        }
     }
 }

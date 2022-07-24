@@ -9,11 +9,11 @@ namespace bookshop.Service;
 
 public interface BookInter
 {
-    public Task<bool> saveBook(Book Book);
+    public Task<bool> saveBook(BookRequest bookRequest);
     public Task<bool> deleteBook(String bookId);
     public Task<bool> editBook(BookRequest bookRequest);
     public Task<Book> findBookById(String bookId);
-    public Task<List<Book>> findBook(String Book,int pageIndex);
+    public Task<Response<Book>> findBook(String Book,int pageIndex);
 }
 
 public class BookService : BookInter
@@ -25,11 +25,20 @@ public class BookService : BookInter
         _dbcontext = dbcontext;
     }
 
-    public async Task<bool> saveBook(Book Book)
+    public async Task<bool> saveBook(BookRequest bookRequest)
     {
         try
         {
-            await _dbcontext.Books.AddAsync(Book);
+            Book book = new Book()
+            {
+                nameBook = bookRequest.nameBook,
+                author = bookRequest.author,
+                publish = bookRequest.publish,
+                count = bookRequest.count,
+                price = bookRequest.price,
+                image = Encoding.ASCII.GetBytes(bookRequest.image)
+            };
+            await _dbcontext.Books.AddAsync(book);
             await _dbcontext.SaveChangesAsync();
             return true;
         }
@@ -94,14 +103,18 @@ public class BookService : BookInter
         }
     }
 
-    public async Task<List<Book>> findBook(string Book,int pageIndex)
+    public async Task<Response<Book>> findBook(string Book,int pageIndex)
     {
         try
         {
             if (Book==null)
             {
-                int pageNumber = pageIndex;
-                return PaginatedList<Book>.CreateAsync(_dbcontext.Books.ToList(), pageNumber, 5);
+                Response<Book> book = new Response<Book>()
+                {
+                    result = PaginatedList<Book>.CreateAsync(_dbcontext.Books.ToList(), pageIndex, 5),
+                    totalBook = _dbcontext.Books.ToList().Count
+                };
+                return book;
             }
 
             return null;

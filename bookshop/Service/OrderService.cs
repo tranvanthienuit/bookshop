@@ -1,5 +1,6 @@
 ﻿using bookshop.DbContext;
 using bookshop.Entity;
+using bookshop.Entity.Model;
 using bookshop.Paging;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,7 +12,7 @@ public interface OrderInter
     public Task<bool> deleteOrder(String orderId);
     public Task<bool> editOrder(Order orderRequest);
     public Task<Order> findOrderById(String orderId);
-    public Task<List<Order>> findOrder(String orderRequest,int pageIndex);
+    public Task<Response<Order>> findOrder(String orderRequest,int pageIndex);
 }
 public class OrderService : OrderInter
 {
@@ -88,12 +89,16 @@ public class OrderService : OrderInter
         }
     }
 
-    public async Task<List<Order>> findOrder(string order,int pageIndex)
+    public async Task<Response<Order>> findOrder(string order,int pageIndex)
     {
         try
         {
-            int pageNumber = pageIndex;
-            return PaginatedList<Order>.CreateAsync(_dbcontext.Orders.ToList(), pageNumber, 5);
+            Response<Order> orderList = new Response<Order>()
+            {
+                result = PaginatedList<Order>.CreateAsync(_dbcontext.Orders.ToList(), pageIndex, 5),
+                totalBook = _dbcontext.Books.ToList().Count
+            };
+            return orderList;
         }
         catch (Exception e)
         {

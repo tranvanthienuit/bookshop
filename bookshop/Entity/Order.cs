@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace bookshop.Entity;
 
 public class Order
 {
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public String orderId { get; set; }
     public DateTime dayAdd { get; set; } = DateTime.Now;
     public int totalBook { get; set; }

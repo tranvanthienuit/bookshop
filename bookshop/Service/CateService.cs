@@ -1,5 +1,6 @@
 ﻿using bookshop.DbContext;
 using bookshop.Entity;
+using bookshop.Entity.Model;
 using bookshop.Paging;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,7 +12,7 @@ public interface CateInter
     public Task<bool> deleteCate(String cateId);
     public Task<bool> editCate(Category Cate);
     public Task<Category> findCateById(String cateId);
-    public Task<List<Category>> findCate(String Cate,int pageIndex);
+    public Task<Response<Category>> findCate(String Cate,int pageIndex);
 }
 
 public class CateService : CateInter
@@ -88,12 +89,16 @@ public class CateService : CateInter
         }
     }
 
-    public async Task<List<Category>> findCate(string Cate,int pageIndex)
+    public async Task<Response<Category>> findCate(string Cate,int pageIndex)
     {
         try
         {
-            int pageNumber = pageIndex;
-            return PaginatedList<Category>.CreateAsync(_dbcontext.Categories.ToList(), pageNumber, 5);
+            Response<Category> category = new Response<Category>()
+            {
+                result = PaginatedList<Category>.CreateAsync(_dbcontext.Categories.ToList(), pageIndex, 5),
+                totalBook = _dbcontext.Books.ToList().Count
+            };
+            return category;
         }
         catch (Exception e)
         {
