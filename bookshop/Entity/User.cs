@@ -8,6 +8,7 @@ public class User : IdentityUser
     public String address { get; set; }
     public DateTime dayAdd { get; set; }= DateTime.Now;
     public String sex { get; set; }
+    public String telephone { get; set; }
     public Byte[] image { get; set; }
     public List<Order> Orders{ get; set; }
 }

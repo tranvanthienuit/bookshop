@@ -3,6 +3,7 @@ using bookshop.DbContext;
 using bookshop.Entity;
 using bookshop.Entity.Model;
 using bookshop.Paging;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace bookshop.Service;
@@ -19,10 +20,12 @@ public interface BookInter
 public class BookService : BookInter
 {
     private readonly Dbcontext _dbcontext;
+    private readonly UserManager<User> _userManager;
 
-    public BookService(Dbcontext dbcontext)
+    public BookService(Dbcontext dbcontext, UserManager<User> userManager)
     {
         _dbcontext = dbcontext;
+        _userManager = userManager;
     }
 
     public async Task<bool> saveBook(BookRequest bookRequest)
@@ -107,27 +110,68 @@ public class BookService : BookInter
     {
         try
         {
+            bool roleCurrent = Thread.CurrentPrincipal.IsInRole("admin");
             if (bookRequest == null)
             {
-                Response<Book> book = new Response<Book>()
+                if (roleCurrent)
                 {
-                    result = PaginatedList<Book>.CreateAsync(_dbcontext.Books.ToList(), pageIndex, 5),
-                    totalBook = _dbcontext.Books.ToList().Count
-                };
-                return book;
+                    // Nếu người đăng nhập là admin lấy tất cả các sách
+                    var books = await _dbcontext.Books.Where(x =>
+                        x.nameBook.Contains(bookRequest) || x.author.Contains(bookRequest) ||
+                        x.Category.categoryName.Contains(bookRequest)).ToListAsync();
+                    Response<Book> book = new Response<Book>()
+                    {
+                        result = PaginatedList<Book>.CreateAsync(books, pageIndex, 5),
+                        totalBook = _dbcontext.Books.ToList().Count
+                    };
+                    return book;
+                }
+                else
+                {
+                    // Nếu người đăng nhập là user lấy các sách có số lượng lớn hơn 0
+                    var books = await _dbcontext.Books.Where(x =>
+                        x.nameBook.Contains(bookRequest) || x.author.Contains(bookRequest) ||
+                        x.Category.categoryName.Contains(bookRequest)).Where(x=>x.count>0).ToListAsync();
+                    Response<Book> book = new Response<Book>()
+                    {
+                        result = PaginatedList<Book>.CreateAsync(books, pageIndex, 5),
+                        totalBook = _dbcontext.Books.ToList().Count
+                    };
+                    return book;
+                }
             }
 
-            var bookFilter = await _dbcontext.Books.Where(x =>
-                x.nameBook.Contains(bookRequest) || x.author.Contains(bookRequest) ||
-                x.Category.categoryName.Contains(bookRequest)).ToListAsync();
-            if (bookFilter != null)
+            if (roleCurrent)
             {
-                Response<Book> book = new Response<Book>()
+                // Nếu người đăng nhập là admin lấy tất cả các sách
+                var bookFilter = await _dbcontext.Books.Where(x =>
+                    x.nameBook.Contains(bookRequest) || x.author.Contains(bookRequest) ||
+                    x.Category.categoryName.Contains(bookRequest)).ToListAsync();
+                if (bookFilter != null)
                 {
-                    result = PaginatedList<Book>.CreateAsync(bookFilter, pageIndex, 5),
-                    totalBook = _dbcontext.Books.ToList().Count
-                };
-                return book;
+                    Response<Book> book = new Response<Book>()
+                    {
+                        result = PaginatedList<Book>.CreateAsync(bookFilter, pageIndex, 5),
+                        totalBook = _dbcontext.Books.ToList().Count
+                    };
+                    return book;
+                }
+            }
+            else
+            {
+                // Nếu người đăng nhập là user lấy các sách có số lượng lớn hơn 0
+                var bookFilter = await _dbcontext.Books.Where(x =>
+                    x.nameBook.Contains(bookRequest) || x.author.Contains(bookRequest) ||
+                    x.Category.categoryName.Contains(bookRequest)).Where(x=>x.count>0).ToListAsync();
+                if (bookFilter != null)
+                {
+                    Response<Book> book = new Response<Book>()
+                    {
+                        result = PaginatedList<Book>.CreateAsync(bookFilter, pageIndex, 5),
+                        totalBook = _dbcontext.Books.ToList().Count
+                    };
+                    return book;
+                }
             }
 
             return null;

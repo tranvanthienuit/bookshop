@@ -1,4 +1,6 @@
-﻿using bookshop.Entity.Model;
+﻿using bookshop.DbContext;
+using bookshop.Entity;
+using bookshop.Entity.Model;
 using bookshop.Service;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,21 +12,24 @@ namespace bookshop.Controllers.Common;
 public class HomeController : Controller
 {
     private readonly UserManager<Entity.User> _userManager;
-    private readonly RoleManager<IdentityRole> _roleManager;
     private readonly SignInManager<Entity.User> _signInManager;
     private readonly UserInter _userInter;
     private readonly IJwtUtils _jwtUtils;
     private readonly BookInter _bookInter;
+    private readonly OrderInter _orderInter;
+    private readonly OrderDeInter _orderDeInter;
+    private readonly Dbcontext _dbcontext;
 
-    public HomeController(UserManager<Entity.User> userManager, RoleManager<IdentityRole> roleManager,
-        SignInManager<Entity.User> signInManager, UserInter userInter, IJwtUtils jwtUtils, BookInter bookInter)
+    public HomeController(UserManager<Entity.User> userManager, SignInManager<Entity.User> signInManager, UserInter userInter, IJwtUtils jwtUtils, BookInter bookInter, OrderInter orderInter, OrderDeInter orderDeInter, Dbcontext dbcontext)
     {
         _userManager = userManager;
-        _roleManager = roleManager;
         _signInManager = signInManager;
         _userInter = userInter;
         _jwtUtils = jwtUtils;
         _bookInter = bookInter;
+        _orderInter = orderInter;
+        _orderDeInter = orderDeInter;
+        _dbcontext = dbcontext;
     }
 
     [HttpPost("/register")]
@@ -99,6 +104,60 @@ public class HomeController : Controller
         {
             Console.WriteLine(e);
             throw;
+        }
+    }
+    [HttpPost("/buy/book")]
+    public async Task<IActionResult> buy([FromBody] cartRequest cartRequest)
+    {
+        try
+        {
+            String username = Thread.CurrentPrincipal.Identity.Name;
+            Entity.User user = await _userManager.FindByNameAsync(username);
+            Order order = new Order()
+            {
+                totalBook = cartRequest.totalBook,
+                totalPrice = cartRequest.totalPrice,
+                telephone = user.telephone,
+                address = user.address,
+                status = "chua giao",
+                pay = "chua thanh toan",
+                username = user.UserName,
+                fullname = user.fullname,
+                User = user
+            };
+            var orderResult = await _orderInter.saveOrder(order);
+            if (!orderResult)
+            {
+                Console.WriteLine(orderResult);
+            }
+
+            Order orderData = await _orderInter.findOrderById(order.orderId);
+            Parallel.ForEach(cartRequest.book,async (x) =>
+            {
+                OrderDe orderDe = new OrderDe()
+                {
+                    count = x.totalBook,
+                    totalPrice = x.totalPrice,
+                    Book = x.book,
+                    Order = orderData
+                };
+                var orderDeResult = await _orderDeInter.saveOrderDe(orderDe);
+                if (!orderDeResult)
+                {
+                    Console.WriteLine(orderDeResult);
+                }
+                var book = await _bookInter.findBookById(x.book.bookId);
+                int value = (book.count - x.totalBook);
+                book.count = value;
+                _dbcontext.Update(book);
+                await _dbcontext.SaveChangesAsync();
+            });
+            return Ok("thanh cong");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return Ok("that bai");
         }
     }
 }

@@ -27,3 +27,17 @@ public class BookRequest
     public int count{ get; set; }
     public String image { get; set; }
 }
+
+public class BookBuy
+{
+    public Book book { get; set; }
+    public double totalPrice { get; set; }
+    public int totalBook { get; set; }
+}
+
+public class cartRequest
+{
+    public List<BookBuy> book { get; set; }
+    public double totalPrice { get; set; }
+    public int totalBook { get; set; }
+}

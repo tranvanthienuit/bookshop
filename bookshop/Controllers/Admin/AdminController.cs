@@ -143,25 +143,6 @@ public class AdminController : Controller
         }
     }
     //Order
-    [HttpPost("/admin/save-order")]
-    public async Task<IActionResult> saveOrder([FromBody] Order order)
-    {
-        try
-        {
-            var result = await _orderInter.saveOrder(order);
-            if (result)
-            {
-                return Ok("thanh cong");
-            }
-
-            return Ok("that bai");
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            return Ok("that bai");
-        }
-    }
     [HttpGet("/admin/delete-order/{orderId}")]
     public async Task<IActionResult> deleteOrder(String orderId)
     {
@@ -201,25 +182,6 @@ public class AdminController : Controller
         }
     }
     //orderdetail
-    [HttpPost("/admin/save-orderde")]
-    public async Task<IActionResult> saveOrderDe([FromBody] OrderDe orderDe)
-    {
-        try
-        {
-            var result = await _orderDeInter.saveOrderDe(orderDe);
-            if (result)
-            {
-                return Ok("thanh cong");
-            }
-
-            return Ok("that bai");
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            return Ok("that bai");
-        }
-    }
     [HttpGet("/admin/delete-orderde/{orderdeId}")]
     public async Task<IActionResult> deleteOrderDe(String orderDeId)
     {
