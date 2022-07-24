@@ -14,11 +14,8 @@ public class Dbcontext : IdentityDbContext<User>
     {
         base.OnModelCreating(modelBuilder);
     }
-    // public DbSet<Rate> Rates { get; set; }
     public DbSet<OrderDe> OrderDes { get; set; }
     public DbSet<Order> Orders{ get; set; }
-    // public DbSet<Comment> Comments{ get; set; }
     public DbSet<Category> Categories{ get; set; }
     public DbSet<Book> Books{ get; set; }
-    // public DbSet<Blog> Blogs{ get; set; }
 }

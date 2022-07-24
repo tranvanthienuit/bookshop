@@ -218,32 +218,6 @@ namespace bookshop.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Blogs",
-                columns: table => new
-                {
-                    blogId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    context = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    content = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    dayAdd = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    image = table.Column<byte[]>(type: "longblob", nullable: false),
-                    UserId = table.Column<string>(type: "varchar(255)", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Blogs", x => x.blogId);
-                    table.ForeignKey(
-                        name: "FK_Blogs_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "Orders",
                 columns: table => new
                 {
@@ -293,6 +267,7 @@ namespace bookshop.Migrations
                     dayAdd = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     price = table.Column<double>(type: "double", nullable: false),
                     count = table.Column<int>(type: "int", nullable: false),
+                    image = table.Column<byte[]>(type: "longblob", nullable: false),
                     categoryId = table.Column<string>(type: "varchar(255)", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
@@ -308,52 +283,21 @@ namespace bookshop.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Comments",
-                columns: table => new
-                {
-                    commentId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    content = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    dayAdd = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    UserId = table.Column<string>(type: "varchar(255)", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    bookId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Comments", x => x.commentId);
-                    table.ForeignKey(
-                        name: "FK_Comments_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Comments_Books_bookId",
-                        column: x => x.bookId,
-                        principalTable: "Books",
-                        principalColumn: "bookId",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "OrderDes",
                 columns: table => new
                 {
-                    orderId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    orderDeId = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     count = table.Column<int>(type: "int", nullable: false),
                     totalPrice = table.Column<double>(type: "double", nullable: false),
                     bookId = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    orderId1 = table.Column<string>(type: "varchar(255)", nullable: false)
+                    orderId = table.Column<string>(type: "varchar(255)", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OrderDes", x => x.orderId);
+                    table.PrimaryKey("PK_OrderDes", x => x.orderDeId);
                     table.ForeignKey(
                         name: "FK_OrderDes_Books_bookId",
                         column: x => x.bookId,
@@ -361,40 +305,10 @@ namespace bookshop.Migrations
                         principalColumn: "bookId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_OrderDes_Orders_orderId1",
-                        column: x => x.orderId1,
+                        name: "FK_OrderDes_Orders_orderId",
+                        column: x => x.orderId,
                         principalTable: "Orders",
-                        principalColumn: "orderId",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "Rates",
-                columns: table => new
-                {
-                    rateId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    rate = table.Column<double>(type: "double", nullable: false),
-                    bookId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    UserId = table.Column<string>(type: "varchar(255)", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Rates", x => x.rateId);
-                    table.ForeignKey(
-                        name: "FK_Rates_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Rates_Books_bookId",
-                        column: x => x.bookId,
-                        principalTable: "Books",
-                        principalColumn: "bookId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "orderId");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -436,24 +350,9 @@ namespace bookshop.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Blogs_UserId",
-                table: "Blogs",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Books_categoryId",
                 table: "Books",
                 column: "categoryId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Comments_bookId",
-                table: "Comments",
-                column: "bookId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Comments_UserId",
-                table: "Comments",
-                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderDes_bookId",
@@ -461,23 +360,13 @@ namespace bookshop.Migrations
                 column: "bookId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderDes_orderId1",
+                name: "IX_OrderDes_orderId",
                 table: "OrderDes",
-                column: "orderId1");
+                column: "orderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_UserId",
                 table: "Orders",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Rates_bookId",
-                table: "Rates",
-                column: "bookId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Rates_UserId",
-                table: "Rates",
                 column: "UserId");
         }
 
@@ -499,31 +388,22 @@ namespace bookshop.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Blogs");
-
-            migrationBuilder.DropTable(
-                name: "Comments");
-
-            migrationBuilder.DropTable(
                 name: "OrderDes");
-
-            migrationBuilder.DropTable(
-                name: "Rates");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Orders");
-
-            migrationBuilder.DropTable(
                 name: "Books");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "Orders");
 
             migrationBuilder.DropTable(
                 name: "Categories");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
         }
     }
 }

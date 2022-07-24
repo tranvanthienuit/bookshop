@@ -19,36 +19,6 @@ namespace bookshop.Migrations
                 .HasAnnotation("ProductVersion", "6.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("bookshop.Entity.Blog", b =>
-                {
-                    b.Property<string>("blogId")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("content")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("context")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime>("dayAdd")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<byte[]>("image")
-                        .IsRequired()
-                        .HasColumnType("longblob");
-
-                    b.HasKey("blogId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Blogs");
-                });
-
             modelBuilder.Entity("bookshop.Entity.Book", b =>
                 {
                     b.Property<string>("bookId")
@@ -66,6 +36,10 @@ namespace bookshop.Migrations
 
                     b.Property<DateTime>("dayAdd")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<byte[]>("image")
+                        .IsRequired()
+                        .HasColumnType("longblob");
 
                     b.Property<string>("nameBook")
                         .IsRequired()
@@ -97,34 +71,6 @@ namespace bookshop.Migrations
                     b.HasKey("categoryId");
 
                     b.ToTable("Categories");
-                });
-
-            modelBuilder.Entity("bookshop.Entity.Comment", b =>
-                {
-                    b.Property<string>("commentId")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("bookId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("content")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime>("dayAdd")
-                        .HasColumnType("datetime(6)");
-
-                    b.HasKey("commentId");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("bookId");
-
-                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("bookshop.Entity.Order", b =>
@@ -177,7 +123,7 @@ namespace bookshop.Migrations
 
             modelBuilder.Entity("bookshop.Entity.OrderDe", b =>
                 {
-                    b.Property<string>("orderId")
+                    b.Property<string>("orderDeId")
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("bookId")
@@ -187,44 +133,19 @@ namespace bookshop.Migrations
                     b.Property<int>("count")
                         .HasColumnType("int");
 
-                    b.Property<string>("orderId1")
-                        .IsRequired()
+                    b.Property<string>("orderId")
                         .HasColumnType("varchar(255)");
 
                     b.Property<double>("totalPrice")
                         .HasColumnType("double");
 
-                    b.HasKey("orderId");
+                    b.HasKey("orderDeId");
 
                     b.HasIndex("bookId");
 
-                    b.HasIndex("orderId1");
+                    b.HasIndex("orderId");
 
                     b.ToTable("OrderDes");
-                });
-
-            modelBuilder.Entity("bookshop.Entity.Rate", b =>
-                {
-                    b.Property<string>("rateId")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("bookId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<double>("rate")
-                        .HasColumnType("double");
-
-                    b.HasKey("rateId");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("bookId");
-
-                    b.ToTable("Rates");
                 });
 
             modelBuilder.Entity("bookshop.Entity.User", b =>
@@ -438,15 +359,6 @@ namespace bookshop.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("bookshop.Entity.Blog", b =>
-                {
-                    b.HasOne("bookshop.Entity.User", "User")
-                        .WithMany("Blogs")
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("bookshop.Entity.Book", b =>
                 {
                     b.HasOne("bookshop.Entity.Category", "Category")
@@ -454,23 +366,6 @@ namespace bookshop.Migrations
                         .HasForeignKey("categoryId");
 
                     b.Navigation("Category");
-                });
-
-            modelBuilder.Entity("bookshop.Entity.Comment", b =>
-                {
-                    b.HasOne("bookshop.Entity.User", "User")
-                        .WithMany("Comments")
-                        .HasForeignKey("UserId");
-
-                    b.HasOne("bookshop.Entity.Book", "Book")
-                        .WithMany("Comments")
-                        .HasForeignKey("bookId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Book");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("bookshop.Entity.Order", b =>
@@ -492,30 +387,11 @@ namespace bookshop.Migrations
 
                     b.HasOne("bookshop.Entity.Order", "Order")
                         .WithMany("OrderDes")
-                        .HasForeignKey("orderId1")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("orderId");
 
                     b.Navigation("Book");
 
                     b.Navigation("Order");
-                });
-
-            modelBuilder.Entity("bookshop.Entity.Rate", b =>
-                {
-                    b.HasOne("bookshop.Entity.User", "User")
-                        .WithMany("Rates")
-                        .HasForeignKey("UserId");
-
-                    b.HasOne("bookshop.Entity.Book", "Book")
-                        .WithMany("Rates")
-                        .HasForeignKey("bookId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Book");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -571,11 +447,7 @@ namespace bookshop.Migrations
 
             modelBuilder.Entity("bookshop.Entity.Book", b =>
                 {
-                    b.Navigation("Comments");
-
                     b.Navigation("OrderDes");
-
-                    b.Navigation("Rates");
                 });
 
             modelBuilder.Entity("bookshop.Entity.Category", b =>
@@ -590,13 +462,7 @@ namespace bookshop.Migrations
 
             modelBuilder.Entity("bookshop.Entity.User", b =>
                 {
-                    b.Navigation("Blogs");
-
-                    b.Navigation("Comments");
-
                     b.Navigation("Orders");
-
-                    b.Navigation("Rates");
                 });
 #pragma warning restore 612, 618
         }

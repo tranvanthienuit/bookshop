@@ -2,6 +2,7 @@
 using bookshop.DbContext;
 using bookshop.Entity;
 using bookshop.Entity.Model;
+using bookshop.Paging;
 using Microsoft.EntityFrameworkCore;
 
 namespace bookshop.Service;
@@ -12,7 +13,7 @@ public interface BookInter
     public Task<bool> deleteBook(String bookId);
     public Task<bool> editBook(BookRequest bookRequest);
     public Task<Book> findBookById(String bookId);
-    public Task<List<Book>> findBook(String Book);
+    public Task<List<Book>> findBook(String Book,int pageIndex);
 }
 
 public class BookService : BookInter
@@ -93,11 +94,17 @@ public class BookService : BookInter
         }
     }
 
-    public async Task<List<Book>> findBook(string Book)
+    public async Task<List<Book>> findBook(string Book,int pageIndex)
     {
         try
         {
-            return await _dbcontext.Books.ToListAsync();
+            if (Book==null)
+            {
+                int pageNumber = pageIndex;
+                return PaginatedList<Book>.CreateAsync(_dbcontext.Books.ToList(), pageNumber, 5);
+            }
+
+            return null;
         }
         catch (Exception e)
         {

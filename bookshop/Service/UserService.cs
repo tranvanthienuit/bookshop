@@ -2,6 +2,7 @@
 using bookshop.DbContext;
 using bookshop.Entity;
 using bookshop.Entity.Model;
+using bookshop.Paging;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,7 +13,7 @@ public interface UserInter
     public Task<bool> saveUser(UserRequest userRequest);
     public Task<bool> deleteUserById(String userId);
     public Task<bool> editUser(UserRequest userRequest);
-    public Task<List<User>> findUser(String user);
+    public Task<List<User>> findUser(String user,int pageIndex);
     public Task<User> findUserById(String userId);
 }
 public class UserService : UserInter
@@ -130,9 +131,19 @@ public class UserService : UserInter
         }
     }
 
-    public async Task<List<User>> findUser(string user)
+    public async Task<List<User>> findUser(string user,int pageIndex)
     {
-        return await _userManager.Users.ToListAsync();
+        try
+        {
+            int pageNumber = pageIndex;
+            var userList = _userManager.Users.ToList();
+            return PaginatedList<User>.CreateAsync(userList, pageNumber, 5);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return null;
+        }
     }
 
     public async Task<User> findUserById(string userId)
