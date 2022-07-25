@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace bookshop.Controllers.Admin;
+
 [ApiController]
 [Authorize(Roles = "admin")]
 public class AdminController : Controller
@@ -15,7 +16,8 @@ public class AdminController : Controller
     private readonly OrderDeInter _orderDeInter;
     private readonly UserInter _userInter;
 
-    public AdminController(BookInter bookInter, CateInter cateInter, OrderInter orderInter, OrderDeInter orderDeInter, UserInter userInter)
+    public AdminController(BookInter bookInter, CateInter cateInter, OrderInter orderInter, OrderDeInter orderDeInter,
+        UserInter userInter)
     {
         _bookInter = bookInter;
         _cateInter = cateInter;
@@ -44,6 +46,7 @@ public class AdminController : Controller
             return Ok("that bai");
         }
     }
+
     [HttpGet("/admin/delete-book/{bookId}")]
     public async Task<IActionResult> deleteBook(String bookId)
     {
@@ -63,6 +66,7 @@ public class AdminController : Controller
             return Ok("that bai");
         }
     }
+
     [HttpPut("/admin/edit-book")]
     public async Task<IActionResult> editBook([FromBody] BookRequest bookRequest)
     {
@@ -82,8 +86,8 @@ public class AdminController : Controller
             return Ok("that bai");
         }
     }
-    
-    
+
+
     //category
     [HttpPost("/admin/save-category")]
     public async Task<IActionResult> saveCategory([FromBody] Category category)
@@ -104,6 +108,7 @@ public class AdminController : Controller
             return Ok("that bai");
         }
     }
+
     [HttpGet("/admin/delete-category/{cateId}")]
     public async Task<IActionResult> deleteCategory(String cateId)
     {
@@ -123,6 +128,7 @@ public class AdminController : Controller
             return Ok("that bai");
         }
     }
+
     [HttpPut("/admin/edit-category")]
     public async Task<IActionResult> editBook([FromBody] Category category)
     {
@@ -142,6 +148,7 @@ public class AdminController : Controller
             return Ok("that bai");
         }
     }
+
     //Order
     [HttpGet("/admin/delete-order/{orderId}")]
     public async Task<IActionResult> deleteOrder(String orderId)
@@ -162,6 +169,7 @@ public class AdminController : Controller
             return Ok("that bai");
         }
     }
+
     [HttpPut("/admin/edit-order")]
     public async Task<IActionResult> editBook([FromBody] Order order)
     {
@@ -181,6 +189,47 @@ public class AdminController : Controller
             return Ok("that bai");
         }
     }
+
+    [HttpGet("/admin/find-order/{pageIndex}")]
+    public async Task<IActionResult> findOrder(int pageIndex = 1)
+    {
+        try
+        {
+            var result = await _orderInter.findOrder(null, pageIndex);
+            if (result != null)
+            {
+                return Ok(result);
+            }
+
+            return null;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
+    [HttpGet("/admin/find-order-info/{text}/{pageIndex}")]
+    public async Task<IActionResult> findOrderInfo(String text, int pageIndex)
+    {
+        try
+        {
+            var result = await _orderInter.findOrder(text, pageIndex = 1);
+            if (result != null)
+            {
+                return Ok(result);
+            }
+
+            return null;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return null;
+        }
+    }
+
     //orderdetail
     [HttpGet("/admin/delete-orderde/{orderdeId}")]
     public async Task<IActionResult> deleteOrderDe(String orderDeId)
@@ -201,14 +250,35 @@ public class AdminController : Controller
             return Ok("that bai");
         }
     }
-    //User
-    [HttpGet("/admin/find-user/{text}/{pageIndex}")]
-    public async Task<IActionResult> findUser(String text,int pageIndex=1)
+
+    [HttpGet("/admin/find-orderde/{orderDeId}")]
+    public async Task<IActionResult> findOrderById(String orderDeId)
     {
         try
         {
-            var result = await _userInter.findUser(text,pageIndex);
-            if (result!=null)
+            var result = await _orderDeInter.findOrderDeById(orderDeId);
+            if (result != null)
+            {
+                return Ok(result);
+            }
+
+            return null;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return null;
+        }
+    }
+
+    //User
+    [HttpGet("/admin/find-user/{text}/{pageIndex}")]
+    public async Task<IActionResult> findUser(String text, int pageIndex = 1)
+    {
+        try
+        {
+            var result = await _userInter.findUser(text, pageIndex);
+            if (result != null)
             {
                 return Ok(result);
             }

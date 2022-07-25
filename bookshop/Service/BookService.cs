@@ -58,6 +58,7 @@ public class BookService : BookInter
         {
             Book book = await _dbcontext.Books.FindAsync(bookId) ?? throw new InvalidOperationException();
             _dbcontext.Books.Remove(book);
+            await _dbcontext.SaveChangesAsync();
             return true;
         }
         catch (Exception e)
