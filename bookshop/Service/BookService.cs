@@ -14,7 +14,11 @@ public interface BookInter
     public Task<bool> deleteBook(String bookId);
     public Task<bool> editBook(BookRequest bookRequest);
     public Task<Book> findBookById(String bookId);
-    public Task<Response<Book>> findBook(string? Book, int pageIndex);
+    public Task<Response<Book>> findBookAdmin(string? Book, int pageIndex);
+    public Task<Response<Book>> findBookUser(string? Book, int pageIndex);
+    public Task<List<String>> findNameAllBook(String? Book);
+    public Task<Response<Book>> findBookByCateId(String? categoryId);
+
 }
 
 public class BookService : BookInter
@@ -36,7 +40,8 @@ public class BookService : BookInter
             {
                 nameBook = bookRequest.nameBook,
                 author = bookRequest.author,
-                publish = bookRequest.publish,
+                publishYear = bookRequest.publishYear,
+                publishCom = bookRequest.publishCom,
                 count = bookRequest.count,
                 price = bookRequest.price,
                 image = Encoding.ASCII.GetBytes(bookRequest.image)
@@ -77,7 +82,8 @@ public class BookService : BookInter
             {
                 book.nameBook = bookRequest.nameBook;
                 book.author = bookRequest.author;
-                book.publish = bookRequest.publish;
+                book.publishYear = bookRequest.publishYear;
+                book.publishCom = bookRequest.publishCom;
                 book.count = bookRequest.count;
                 book.price = bookRequest.price;
                 book.image = Encoding.ASCII.GetBytes(bookRequest.image);
@@ -107,72 +113,110 @@ public class BookService : BookInter
         }
     }
 
-    public async Task<Response<Book>> findBook(string? bookRequest, int pageIndex)
+    public async Task<Response<Book>> findBookAdmin(string? bookRequest, int pageIndex)
     {
         try
         {
-            bool roleCurrent = Thread.CurrentPrincipal.IsInRole("admin");
             if (bookRequest == null)
             {
-                if (roleCurrent)
-                {
-                    // Nếu người đăng nhập là admin lấy tất cả các sách
-                    var books = await _dbcontext.Books.Where(x =>
-                        x.nameBook.Contains(bookRequest) || x.author.Contains(bookRequest) ||
-                        x.Category.categoryName.Contains(bookRequest)).ToListAsync();
-                    Response<Book> book = new Response<Book>()
-                    {
-                        result = PaginatedList<Book>.CreateAsync(books, pageIndex, 5),
-                        totalBook = _dbcontext.Books.ToList().Count
-                    };
-                    return book;
-                }
-                else
-                {
-                    // Nếu người đăng nhập là user lấy các sách có số lượng lớn hơn 0
-                    var books = await _dbcontext.Books.Where(x =>
-                        x.nameBook.Contains(bookRequest) || x.author.Contains(bookRequest) ||
-                        x.Category.categoryName.Contains(bookRequest)).Where(x=>x.count>0).ToListAsync();
-                    Response<Book> book = new Response<Book>()
-                    {
-                        result = PaginatedList<Book>.CreateAsync(books, pageIndex, 5),
-                        totalBook = _dbcontext.Books.ToList().Count
-                    };
-                    return book;
-                }
-            }
-
-            if (roleCurrent)
-            {
-                // Nếu người đăng nhập là admin lấy tất cả các sách
-                var bookFilter = await _dbcontext.Books.Where(x =>
+                var books = await _dbcontext.Books.Where(x =>
                     x.nameBook.Contains(bookRequest) || x.author.Contains(bookRequest) ||
                     x.Category.categoryName.Contains(bookRequest)).ToListAsync();
-                if (bookFilter != null)
+                Response<Book> book = new Response<Book>()
                 {
-                    Response<Book> book = new Response<Book>()
-                    {
-                        result = PaginatedList<Book>.CreateAsync(bookFilter, pageIndex, 5),
-                        totalBook = _dbcontext.Books.ToList().Count
-                    };
-                    return book;
-                }
+                    result = PaginatedList<Book>.CreateAsync(books, pageIndex, 5),
+                    totalBook = _dbcontext.Books.ToList().Count
+                };
+                return book;
             }
             else
             {
-                // Nếu người đăng nhập là user lấy các sách có số lượng lớn hơn 0
-                var bookFilter = await _dbcontext.Books.Where(x =>
+                var books = await _dbcontext.Books.Where(x =>
                     x.nameBook.Contains(bookRequest) || x.author.Contains(bookRequest) ||
-                    x.Category.categoryName.Contains(bookRequest)).Where(x=>x.count>0).ToListAsync();
-                if (bookFilter != null)
+                    x.Category.categoryName.Contains(bookRequest)).ToListAsync();
+                Response<Book> book = new Response<Book>()
                 {
-                    Response<Book> book = new Response<Book>()
-                    {
-                        result = PaginatedList<Book>.CreateAsync(bookFilter, pageIndex, 5),
-                        totalBook = _dbcontext.Books.ToList().Count
-                    };
-                    return book;
-                }
+                    result = PaginatedList<Book>.CreateAsync(books, pageIndex, 5),
+                    totalBook = _dbcontext.Books.ToList().Count
+                };
+                return book;
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
+    public async Task<Response<Book>> findBookUser(string? bookRequest, int pageIndex)
+    {
+        try
+        {
+            if (bookRequest == null)
+            {
+                var books = await _dbcontext.Books.Where(x => x.count > 0).ToListAsync();
+                Response<Book> book = new Response<Book>()
+                {
+                    result = PaginatedList<Book>.CreateAsync(books, pageIndex, 20),
+                    totalBook = _dbcontext.Books.ToList().Count
+                };
+                return book;
+            }
+            else
+            {
+                var books = await _dbcontext.Books.Where(x =>
+                    x.nameBook.Contains(bookRequest) || x.author.Contains(bookRequest) ||
+                    x.Category.categoryName.Contains(bookRequest)).Where(x => x.count > 0).ToListAsync();
+                Response<Book> book = new Response<Book>()
+                {
+                    result = PaginatedList<Book>.CreateAsync(books, pageIndex, 20),
+                    totalBook = _dbcontext.Books.ToList().Count
+                };
+                return book;
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return null;
+        }
+    }
+
+    public async Task<List<string>> findNameAllBook(string? bookRequest)
+    {
+        try
+        {
+            var books = await _dbcontext.Books.Where(x =>
+                    x.nameBook.Contains(bookRequest) || x.author.Contains(bookRequest) ||
+                    x.Category.categoryName.Contains(bookRequest)).Where(x => x.count > 0).ToListAsync();
+            List<String> name = new List<string>();
+            foreach (var Book in books)
+            {
+                name.Add(Book.nameBook);
+            }
+
+            return name;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
+    public async Task<Response<Book>> findBookByCateId(string? categoryId)
+    {
+        try
+        {
+            if (categoryId!=null)
+            {
+                Response<Book> book = new Response<Book>()
+                {
+                    result = await _dbcontext.Books.Where(x => x.Category.categoryId == categoryId).ToListAsync(),
+                    totalBook = _dbcontext.Books.Where(x => x.Category.categoryId == categoryId).Count()
+                };
+                return book;
             }
 
             return null;
@@ -180,7 +224,7 @@ public class BookService : BookInter
         catch (Exception e)
         {
             Console.WriteLine(e);
-            return null;
+            throw;
         }
     }
 }

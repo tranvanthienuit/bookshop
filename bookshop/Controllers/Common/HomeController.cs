@@ -19,20 +19,10 @@ public class HomeController : Controller
     private readonly OrderInter _orderInter;
     private readonly OrderDeInter _orderDeInter;
     private readonly Dbcontext _dbcontext;
+    private readonly CateInter _cateInter;
 
-    public HomeController(UserManager<Entity.User> userManager, SignInManager<Entity.User> signInManager, UserInter userInter, IJwtUtils jwtUtils, BookInter bookInter, OrderInter orderInter, OrderDeInter orderDeInter, Dbcontext dbcontext)
-    {
-        _userManager = userManager;
-        _signInManager = signInManager;
-        _userInter = userInter;
-        _jwtUtils = jwtUtils;
-        _bookInter = bookInter;
-        _orderInter = orderInter;
-        _orderDeInter = orderDeInter;
-        _dbcontext = dbcontext;
-    }
-
-    [HttpPost("/register")]
+// nguoi dung
+    [HttpPost("/dang-ky")]
     public async Task<IActionResult> register([FromBody] UserRequest userRequest)
     {
         try
@@ -50,11 +40,12 @@ public class HomeController : Controller
         catch (Exception e)
         {
             Console.WriteLine(e);
-            return Ok("that bai");;
+            return Ok("that bai");
+            ;
         }
     }
 
-    [HttpPost("/login")]
+    [HttpPost("/dang-nhap")]
     public async Task<IActionResult> login([FromBody] UserLogin userLogin)
     {
         try
@@ -62,7 +53,8 @@ public class HomeController : Controller
             Entity.User user = await _userManager.FindByNameAsync(userLogin.username);
             if (user != null)
             {
-                var result = await _signInManager.PasswordSignInAsync(userLogin.username, userLogin.password, false, true);
+                var result =
+                    await _signInManager.PasswordSignInAsync(userLogin.username, userLogin.password, false, true);
                 await _signInManager.SignInAsync(user, false);
                 if (result.Succeeded)
                 {
@@ -75,16 +67,18 @@ public class HomeController : Controller
         catch (Exception e)
         {
             Console.WriteLine(e);
-            return Ok("that bai");;
+            return Ok("that bai");
+            ;
         }
     }
 
-    [HttpGet("/home/{pageIndex}")]
-    public async Task<IActionResult> home(int pageIndex=1)
+//home
+    [HttpGet("/trang-chu/{pageIndex}")]
+    public async Task<IActionResult> home(int pageIndex = 1)
     {
         try
         {
-            return Ok(await _bookInter.findBook(null, pageIndex));
+            return Ok(await _bookInter.findBookUser(null, pageIndex));
         }
         catch (Exception e)
         {
@@ -93,12 +87,12 @@ public class HomeController : Controller
         }
     }
 
-    [HttpGet("/home/{text}/{pageIndex}")]
-    public async Task<IActionResult> search(String text,int pageIndex=1)
+    [HttpGet("/trang-chu/{text}/{pageIndex}")]
+    public async Task<IActionResult> search(String text, int pageIndex = 1)
     {
         try
         {
-            return Ok(await _bookInter.findBook(text, pageIndex));
+            return Ok(await _bookInter.findBookUser(text, pageIndex));
         }
         catch (Exception e)
         {
@@ -106,6 +100,128 @@ public class HomeController : Controller
             throw;
         }
     }
+
+// loai sach
+    [HttpGet("/loai-sach/{categoryId}")]
+    public async Task<IActionResult> getCategoryById(string? categoryId)
+    {
+        try
+        {
+            if (categoryId == null)
+            {
+                return Ok(null);
+            }
+
+            Category category = await _cateInter.findCateById(categoryId);
+            if (category == null)
+            {
+                return Ok(null);
+            }
+
+            return Ok(category);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
+    [HttpGet("/category")]
+    public async Task<IActionResult> getAllCategory()
+    {
+        try
+        {
+            return Ok(await _cateInter.findCate(null, 0));
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
+// sach
+    [HttpGet("/tim-sach")]
+    public async Task<IActionResult> findBookUser([FromBody] Dictionary<String, String> keyword)
+    {
+        try
+        {
+            if (keyword.ContainsKey("infoBook") != null)
+            {
+                return Ok(await _bookInter.findBookUser(keyword["infoBook"], 0));
+            }
+
+            return Ok(null);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+    [HttpGet("/xem-chi-tiet-sach/{bookId}")]
+    public async Task<IActionResult> bookDetail(String bookId)
+    {
+        try
+        {
+            if (bookId!=null)
+            {
+                return Ok(await _bookInter.findBookById(bookId));
+            }
+
+            return null;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return null;
+        }
+    }
+
+    public async Task<IActionResult> searchNameBook([FromBody] Dictionary<String, String> keyword)
+    {
+        try
+        {
+            if (keyword.ContainsKey("infoBook") != null)
+            {
+                return Ok(await _bookInter.findNameAllBook(keyword["infoBook"]));
+            }
+
+            return Ok(null);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+    [HttpGet("/tim-sach/{categoryId}")]
+    public async Task<IActionResult> findBookByCateId(String categoryId)
+    {
+        try
+        {
+            return Ok(await _bookInter.findBookByCateId(categoryId));
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    } 
+    // public async Task<IActionResult> findBookByCondition([FromBody] Dictionary<String, String> keyword)
+    // {
+    //     
+    // }
+    // public async Task<IActionResult> findDataFilter([FromBody] Dictionary<String, String> keyword)
+    // {
+    //     
+    // }
+    // public async Task<IActionResult> appriciateBook([FromBody] Dictionary<String, String> keyword)
+    // {
+    //     
+    // }
+// mua sach
     [HttpPost("/buy/book")]
     public async Task<IActionResult> buy([FromBody] cartRequest cartRequest)
     {
@@ -132,7 +248,7 @@ public class HomeController : Controller
             }
 
             Order orderData = await _orderInter.findOrderById(order.orderId);
-            Parallel.ForEach(cartRequest.book,async (x) =>
+            Parallel.ForEach(cartRequest.book, async (x) =>
             {
                 OrderDe orderDe = new OrderDe()
                 {
@@ -146,6 +262,7 @@ public class HomeController : Controller
                 {
                     Console.WriteLine(orderDeResult);
                 }
+
                 var book = await _bookInter.findBookById(x.book.bookId);
                 int value = (book.count - x.totalBook);
                 book.count = value;

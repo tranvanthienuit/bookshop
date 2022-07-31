@@ -11,4 +11,8 @@ public class User : IdentityUser
     public String telephone { get; set; }
     public Byte[] image { get; set; }
     public List<Order> Orders{ get; set; }
+    public List<Comment> Comments { get; set; }
+    public List<User> Users { get; set; }
+    public List<Rate> Rates { get; set; }
+
 }
