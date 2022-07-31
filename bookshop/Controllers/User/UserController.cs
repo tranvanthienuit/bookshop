@@ -76,4 +76,21 @@ public class UserController : Controller
             return Ok("that bai");
         }
     }
+    // quen mat khau
+    
+    
+    
+    
+    // cai mat khau moi
+    
+    
+    // tim user theo email
+    
+    
+    // tim order
+    
+    
+    
+    //tim orderdetail
+    
 }

@@ -89,6 +89,30 @@ public class AdminController : Controller
 
 
     //category
+    [HttpGet("/loai-sach/{categoryId}")]
+    public async Task<IActionResult> getCategoryById(string? categoryId)
+    {
+        try
+        {
+            if (categoryId == null)
+            {
+                return Ok(null);
+            }
+
+            Category category = await _cateInter.findCateById(categoryId);
+            if (category == null)
+            {
+                return Ok(null);
+            }
+
+            return Ok(category);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
     [HttpPost("/admin/save-category")]
     public async Task<IActionResult> saveCategory([FromBody] Category category)
     {
@@ -130,7 +154,7 @@ public class AdminController : Controller
     }
 
     [HttpPut("/admin/edit-category")]
-    public async Task<IActionResult> editBook([FromBody] Category category)
+    public async Task<IActionResult> editCategory([FromBody] Category category)
     {
         try
         {
@@ -171,7 +195,7 @@ public class AdminController : Controller
     }
 
     [HttpPut("/admin/edit-order")]
-    public async Task<IActionResult> editBook([FromBody] Order order)
+    public async Task<IActionResult> editOrder([FromBody] Order order)
     {
         try
         {

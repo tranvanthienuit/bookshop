@@ -74,7 +74,7 @@ public class HomeController : Controller
 
 //home
     [HttpGet("/trang-chu/{pageIndex}")]
-    public async Task<IActionResult> home(int pageIndex = 1)
+    public async Task<IActionResult> home(int pageIndex = 0)
     {
         try
         {
@@ -86,46 +86,7 @@ public class HomeController : Controller
             throw;
         }
     }
-
-    [HttpGet("/trang-chu/{text}/{pageIndex}")]
-    public async Task<IActionResult> search(String text, int pageIndex = 1)
-    {
-        try
-        {
-            return Ok(await _bookInter.findBookUser(text, pageIndex));
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
-    }
-
 // loai sach
-    [HttpGet("/loai-sach/{categoryId}")]
-    public async Task<IActionResult> getCategoryById(string? categoryId)
-    {
-        try
-        {
-            if (categoryId == null)
-            {
-                return Ok(null);
-            }
-
-            Category category = await _cateInter.findCateById(categoryId);
-            if (category == null)
-            {
-                return Ok(null);
-            }
-
-            return Ok(category);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
-    }
 
     [HttpGet("/category")]
     public async Task<IActionResult> getAllCategory()
@@ -140,7 +101,6 @@ public class HomeController : Controller
             throw;
         }
     }
-
 // sach
     [HttpGet("/tim-sach")]
     public async Task<IActionResult> findBookUser([FromBody] Dictionary<String, String> keyword)
@@ -178,7 +138,7 @@ public class HomeController : Controller
             return null;
         }
     }
-
+    [HttpPost("/search/book")]
     public async Task<IActionResult> searchNameBook([FromBody] Dictionary<String, String> keyword)
     {
         try
@@ -221,6 +181,25 @@ public class HomeController : Controller
     // {
     //     
     // }
+    
+    // order
+    
+    
+    
+    
+    //orderdetail
+    
+    
+    
+    //comment
+    //them comment
+    
+    
+    // xoa comment
+    
+    
+    
+    //sua comment
 // mua sach
     [HttpPost("/buy/book")]
     public async Task<IActionResult> buy([FromBody] cartRequest cartRequest)
