@@ -84,6 +84,9 @@ builder.Services.AddScoped<OrderInter, OrderService>();
 builder.Services.AddScoped<OrderDeInter, OrderDeService>();
 builder.Services.AddScoped<CateInter, CateService>();
 builder.Services.AddScoped<BookInter, BookService>();
+builder.Services.AddScoped<BlogInter, BlogService>();
+builder.Services.AddScoped<CmtInter, CmtService>();
+builder.Services.AddScoped<RateInter, RateService>();
 builder.Services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<Dbcontext>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

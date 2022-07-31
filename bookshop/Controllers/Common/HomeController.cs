@@ -101,6 +101,30 @@ public class HomeController : Controller
             throw;
         }
     }
+    [HttpGet("/loai-sach/{categoryId}")]
+    public async Task<IActionResult> getCategoryById(string? categoryId)
+    {
+        try
+        {
+            if (categoryId == null)
+            {
+                return Ok(null);
+            }
+
+            Category category = await _cateInter.findCateById(categoryId);
+            if (category == null)
+            {
+                return Ok(null);
+            }
+
+            return Ok(category);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
 // sach
     [HttpGet("/tim-sach")]
     public async Task<IActionResult> findBookUser([FromBody] Dictionary<String, String> keyword)
@@ -182,24 +206,22 @@ public class HomeController : Controller
     //     
     // }
     
-    // order
-    
-    
-    
-    
-    //orderdetail
-    
-    
-    
     //comment
     //them comment
-    
-    
+    // public async Task<IActionResult> saveCmt([FromBody] Comment comment)
+    // {
+    //     
+    // }
+
     // xoa comment
     
     
     
     //sua comment
+    
+    //Rate
+    
+    
 // mua sach
     [HttpPost("/buy/book")]
     public async Task<IActionResult> buy([FromBody] cartRequest cartRequest)

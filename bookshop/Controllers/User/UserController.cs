@@ -9,6 +9,8 @@ namespace bookshop.Controllers.User;
 public class UserController : Controller
 {
     private readonly UserInter _userInter;
+    private readonly OrderInter _orderInter;
+    private readonly OrderDeInter _orderDeInter;
 
     public UserController(UserInter userInter)
     {
@@ -85,12 +87,60 @@ public class UserController : Controller
     
     
     // tim user theo email
+    public async Task<IActionResult> findUserByEmail(String email)
+    {
+        try
+        {
+            if (email!=null)
+            {
+                return Ok(await _userInter.findUser(email, 0));
+            }
+
+            return null;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+    
+    // order
+    public async Task<IActionResult> findOrderById(String orderId)
+    {
+        try
+        {
+            if (orderId!=null)
+            {
+                return Ok(await _orderInter.findOrderById(orderId));
+            }
+
+            return null;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
     
     
-    // tim order
-    
-    
-    
-    //tim orderdetail
-    
+    //orderdetail
+    public async Task<IActionResult> findOrderDeByOrderId(String orderId)
+    {
+        try
+        {
+            if (orderId!=null)
+            {
+                return Ok(await _orderDeInter.findOrderDeById(orderId));
+            }
+
+            return null;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
 }

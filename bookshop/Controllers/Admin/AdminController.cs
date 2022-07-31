@@ -87,32 +87,25 @@ public class AdminController : Controller
         }
     }
 
-
-    //category
-    [HttpGet("/loai-sach/{categoryId}")]
-    public async Task<IActionResult> getCategoryById(string? categoryId)
+    public async Task<IActionResult> findAllBook()
     {
         try
         {
-            if (categoryId == null)
+            var result = await _bookInter.findBookAdmin(null, 0);
+            if (result!=null)
             {
-                return Ok(null);
+                return Ok(result);
             }
 
-            Category category = await _cateInter.findCateById(categoryId);
-            if (category == null)
-            {
-                return Ok(null);
-            }
-
-            return Ok(category);
+            return Ok("that bai");
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
-            throw;
+            return Ok("that bai");
         }
     }
+    //category
     [HttpPost("/admin/save-category")]
     public async Task<IActionResult> saveCategory([FromBody] Category category)
     {
@@ -152,7 +145,6 @@ public class AdminController : Controller
             return Ok("that bai");
         }
     }
-
     [HttpPut("/admin/edit-category")]
     public async Task<IActionResult> editCategory([FromBody] Category category)
     {
@@ -276,7 +268,7 @@ public class AdminController : Controller
     }
 
     [HttpGet("/admin/find-orderde/{orderDeId}")]
-    public async Task<IActionResult> findOrderById(String orderDeId)
+    public async Task<IActionResult> findOrderDeById(String orderDeId)
     {
         try
         {
